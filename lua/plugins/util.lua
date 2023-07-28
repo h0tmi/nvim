@@ -1,14 +1,11 @@
 return {
-  -- tex support
-  {
-    "lavreg/vimtex",
-  },
-  -- lua library for neovim
+  -- TRUE MOTHERFUCKING LSP FOR CPP
+
+  -- -- lua library for neovim
   {
     "nvim-lua/plenary.nvim",
     lazy = true,
   },
-
   -- Distraction-free coding for Neovim
   {
     "folke/zen-mode.nvim",

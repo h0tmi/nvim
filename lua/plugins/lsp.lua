@@ -1,27 +1,27 @@
-local function lsp_related_ui_adjust()
-  require("lspconfig.ui.windows").default_options.border = "rounded"
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-
-  local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-  for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-  end
-
-  vim.diagnostic.config({
-    virtual_text = {
-      prefix = '●',
-      severity_sort = true,
-    },
-    float = {
-      border = "rounded",
-      source = "always", -- Or "if_many"
-      prefix = " - ",
-    },
-    severity_sort = true,
-  })
-end
+-- local function lsp_related_ui_adjust()
+--   require("lspconfig.ui.windows").default_options.border = "rounded"
+--   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+--   vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+--
+--   local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+--   for type, icon in pairs(signs) do
+--     local hl = "DiagnosticSign" .. type
+--     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+--   end
+--
+--   vim.diagnostic.config({
+--     virtual_text = {
+--       prefix = '●',
+--       severity_sort = true,
+--     },
+--     float = {
+--       border = "rounded",
+--       source = "always", -- Or "if_many"
+--       prefix = " - ",
+--     },
+--     severity_sort = true,
+--   })
+-- end
 
 local format = function()
   local buf = vim.api.nvim_get_current_buf()
@@ -87,13 +87,6 @@ local servers = {
         }
       }
     }
-  },
-  clangd = {
-    name = "clangd",
-    disabled = not _G.IS_WINDOWS -- false represent don't use this server
-  },
-  texlab = {
-    name = "texlab",
   },
   tsserver = {
     name = "typescript-language-server",
@@ -235,6 +228,12 @@ local function lspconfig_setup()
 end
 
 return {
+  {
+    "ycm-core/YouCompleteMe"
+  },
+  {
+    "p00f/clangd_extensions.nvim",
+  },
   -- configuration for nvim lsp
   {
     "neovim/nvim-lspconfig",
@@ -263,7 +262,6 @@ return {
       },
     },
     config = function()
-      lsp_related_ui_adjust()
       lspconfig_setup()
     end
   },
@@ -294,6 +292,8 @@ return {
         end
       },
 
+
+      --
       -- bridges mason.nvim with the null-ls plugin
       {
         "jay-babu/mason-null-ls.nvim",

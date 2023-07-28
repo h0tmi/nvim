@@ -38,7 +38,7 @@ local function find_files_or_git_files()
     local opts = {
       previewer = enable_previewer,
       no_ignore = true, -- set false to ignore files by .gitignore
-      hidden = true -- set false to ignore dotfiles
+      hidden = true     -- set false to ignore dotfiles
     }
 
     require("telescope.builtin").find_files(opts)
@@ -85,19 +85,19 @@ return {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
     keys = {
-      { "<C-p>", find_files_or_git_files, mode = "n", desc = "Find Files or Git Files" },
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", mode = "n", desc = "Find Files" },
-      { "<C-f>", live_grep, mode = "n", desc = "Live Grep (Args)" },
-      { "<C-f>", "<cmd>Telescope grep_string<cr>", mode = "v", desc = "Grep String" },
-      { "<leader>fh", "<cmd>Telescope help_tags<cr>", mode = "n", desc = "Help Pages" },
+      { "<C-p>",      find_files_or_git_files,          mode = "n", desc = "Find Files or Git Files" },
+      { "<leader>ff", "<cmd>Telescope find_files<cr>",  mode = "n", desc = "Find Files" },
+      { "<C-f>",      live_grep,                        mode = "n", desc = "Live Grep (Args)" },
+      { "<C-f>",      "<cmd>Telescope grep_string<cr>", mode = "v", desc = "Grep String" },
+      { "<leader>fh", "<cmd>Telescope help_tags<cr>",   mode = "n", desc = "Help Pages" },
       { "<leader>fe", "<cmd>Telescope diagnostics<cr>", mode = "n", desc = "Diagnostics" },
-      { "<leader>fn", edit_neovim, mode = "n", desc = "Edit Neovim" },
-      { "<C-n>", file_browser, mode = "n", desc = "File Browser" },
-      { "<leader>hi", "<cmd>Telescope highlights<cr>", mode = "n", desc = "Neovim Highlight Groups" },
-      { "<leader>/", current_buffer_fuzzy_find, mode = "n", desc = "Fuzzy Find in Current Buffer" },
-      { "gd", lsp_definitions, mode = "n", desc = "LSP Find Definitions" },
-      { "gr", lsp_references, mode = "n", desc = "LSP Find References" },
-      { "gi", lsp_implementations, mode = "n", desc = "LSP Find Implementations" },
+      { "<leader>fn", edit_neovim,                      mode = "n", desc = "Edit Neovim" },
+      { "<C-n>",      file_browser,                     mode = "n", desc = "File Browser" },
+      { "<leader>hi", "<cmd>Telescope highlights<cr>",  mode = "n", desc = "Neovim Highlight Groups" },
+      { "<leader>/",  current_buffer_fuzzy_find,        mode = "n", desc = "Fuzzy Find in Current Buffer" },
+      -- { "gd", lsp_definitions, mode = "n", desc = "LSP Find Definitions" },
+      -- { "gr", lsp_references, mode = "n", desc = "LSP Find References" },
+      -- { "gi", lsp_implementations, mode = "n", desc = "LSP Find Implementations" },
     },
     config = function()
       require("telescope").setup {
@@ -114,10 +114,10 @@ return {
         },
         extensions = {
           fzf = {
-            fuzzy = true, -- false will only do exact matching
+            fuzzy = true,                   -- false will only do exact matching
             override_generic_sorter = true, -- override the generic sorter
-            override_file_sorter = true, -- override the file sorter
-            case_mode = "smart_case", -- or "ignore_case" or "respect_case", the default case_mode is "smart_case"
+            override_file_sorter = true,    -- override the file sorter
+            case_mode = "smart_case",       -- or "ignore_case" or "respect_case", the default case_mode is "smart_case"
           },
           file_browser = {
             previewer = false,
@@ -162,12 +162,12 @@ return {
   {
     "ThePrimeagen/harpoon",
     keys = {
-      { "<C-e>", function() require("harpoon.ui").toggle_quick_menu() end, mode = "n", desc = "Harpoon Menu" },
-      { "<leader>a", function() require("harpoon.mark").add_file() end, mode = "n", desc = "Harpoon Add File" },
-      { "<C-j>", function() require("harpoon.ui").nav_file(1) end, mode = "n", desc = "Harpoon Nav File 1" },
-      { "<C-k>", function() require("harpoon.ui").nav_file(2) end, mode = "n", desc = "Harpoon Nav File 2" },
-      { "<C-l>", function() require("harpoon.ui").nav_file(3) end, mode = "n", desc = "Harpoon Nav File 3" },
-      { "<C-h>", function() require("harpoon.ui").nav_file(4) end, mode = "n", desc = "Harpoon Nav File 4" },
+      { "<C-e>",     function() require("harpoon.ui").toggle_quick_menu() end, mode = "n", desc = "Harpoon Menu" },
+      { "<leader>a", function() require("harpoon.mark").add_file() end,        mode = "n", desc = "Harpoon Add File" },
+      { "<C-j>",     function() require("harpoon.ui").nav_file(1) end,         mode = "n", desc = "Harpoon Nav File 1" },
+      { "<C-k>",     function() require("harpoon.ui").nav_file(2) end,         mode = "n", desc = "Harpoon Nav File 2" },
+      { "<C-l>",     function() require("harpoon.ui").nav_file(3) end,         mode = "n", desc = "Harpoon Nav File 3" },
+      { "<C-h>",     function() require("harpoon.ui").nav_file(4) end,         mode = "n", desc = "Harpoon Nav File 4" },
     },
     config = function()
       vim.api.nvim_create_autocmd({ "Filetype" }, {
