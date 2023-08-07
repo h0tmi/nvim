@@ -61,7 +61,7 @@ require("lazy").setup("plugins", {
 
 require("clangd_extensions").setup {
   server = {
-    
+    cmd = {"clangd", "--all-scopes-completion=1", "--clang-tidy=1", "--header-insertion=iwyu", "--enable-config"}
   },
   extensions = {
     -- defaults:
