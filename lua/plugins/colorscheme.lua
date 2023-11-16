@@ -36,7 +36,6 @@ return {
       vim.cmd("colorscheme solarized")
     end
   },
-
   -- gruvbox-material
   {
     "sainnhe/gruvbox-material",

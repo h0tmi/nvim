@@ -1,6 +1,18 @@
 -- leader key is <Space>, defined in init.lua
 local keymap = vim.keymap
 
+local opts = { noremap=true, silent=true }
+
+local function quickfix()
+    vim.lsp.buf.code_action({
+        filter = function(a) return a.isPreferred end,
+        apply = true
+    })
+end
+
+
+vim.keymap.set('n', '<leader>qf', quickfix, opts)
+
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 -- set q to do nothing because it's so annoying (default is recording macro)
@@ -59,3 +71,7 @@ keymap.set("i", ".", ".<C-g>u")
 keymap.set("i", ";", ";<C-g>u")
 
 keymap.set("i", "<C-i>", "<C-i>")
+
+-- Map F1 to run clang-format on the current file
+vim.api.nvim_set_keymap('n', '<F1>', ':!clang-format -i %<CR>', { noremap = true, silent = true })
+

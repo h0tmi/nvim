@@ -88,6 +88,12 @@ local servers = {
       }
     }
   },
+  clangd = {
+    name = "clangd",
+    config = {
+      cmd = {"clangd", "--background-index", "--all-scopes-completion=1", "--clang-tidy=1", "--header-insertion=iwyu", "--enable-config"}
+    },
+  },
   tsserver = {
     name = "typescript-language-server",
   },
@@ -289,6 +295,17 @@ return {
         end
       },
 
+      {
+        "jay-babu/mason-nvim-dap.nvim",
+        event = "VeryLazy",
+        dependencies = {
+          "williamboman/mason.nvim",
+          "mfussenegger/nvim-dap",
+        },
+        opts = {
+          handlers = {},
+        }
+      },
 
       --
       -- bridges mason.nvim with the null-ls plugin
