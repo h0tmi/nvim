@@ -72,14 +72,23 @@ return {
     end,
   },
 
-  -- Spell checking
+  -- English spell checking for comments
   {
     "lucaSartore/fastspell.nvim",
-    enabled = false, -- Disabled (requires Node.js build)
+    enabled = true,
     event = "VeryLazy",
     build = "cd jslib && npm install && npm run build",
     config = function()
-      require("fastspell").setup({})
+      require("fastspell").setup({
+        -- Only check English spelling in comments and strings
+        check_comments = true,
+        check_strings = true,
+        lang = "en",
+        -- Disable naming convention checks
+        check_variable_names = false,
+        check_function_names = false,
+        check_class_names = false,
+      })
     end,
   },
 }

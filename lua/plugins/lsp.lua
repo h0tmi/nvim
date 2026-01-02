@@ -72,14 +72,62 @@ return {
           vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
           vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
           vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature help" }))
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
+
+          -- Floating rename near cursor
+          vim.keymap.set("n", "<leader>rn", function()
+            local curr_name = vim.fn.expand("<cword>")
+            local params = vim.lsp.util.make_position_params()
+
+            -- Override vim.ui.input to show floating window near cursor
+            local original_input = vim.ui.input
+            vim.ui.input = function(input_opts, on_confirm)
+              local buf = vim.api.nvim_create_buf(false, true)
+              local width = math.max(40, #curr_name + 10)
+
+              -- Open window relative to cursor
+              local win = vim.api.nvim_open_win(buf, true, {
+                relative = "cursor",
+                row = 1,
+                col = 0,
+                width = width,
+                height = 1,
+                style = "minimal",
+                border = "rounded",
+                title = " Rename ",
+                title_pos = "center",
+              })
+
+              -- Set initial value
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, { input_opts.default or "" })
+              vim.cmd("startinsert!")
+
+              -- Setup keymaps
+              vim.keymap.set("i", "<CR>", function()
+                local new_name = vim.api.nvim_buf_get_lines(buf, 0, -1, false)[1]
+                vim.api.nvim_win_close(win, true)
+                vim.ui.input = original_input -- Restore
+                if on_confirm then
+                  on_confirm(new_name)
+                end
+              end, { buffer = buf })
+
+              vim.keymap.set("i", "<Esc>", function()
+                vim.api.nvim_win_close(win, true)
+                vim.ui.input = original_input -- Restore
+                if on_confirm then
+                  on_confirm(nil)
+                end
+              end, { buffer = buf })
+            end
+
+            vim.lsp.buf.rename()
+          end, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
+
           vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
           vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show diagnostics" }))
           vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
           vim.keymap.set("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
-          vim.keymap.set("n", "<leader>f", function()
-            vim.lsp.buf.format({ async = true })
-          end, vim.tbl_extend("force", opts, { desc = "Format buffer" }))
+          -- Format is handled by conform.nvim (,f keybinding)
         end,
       })
 
@@ -170,6 +218,23 @@ return {
 
       -- Enable all LSP servers
       vim.lsp.enable({ "clangd", "gopls", "pyright", "bashls" })
+
+      -- Configure LSP floating window borders (like old config)
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+        border = "rounded",
+      })
+
+      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+        border = "rounded",
+      })
+
+      -- Configure diagnostic floating windows
+      vim.diagnostic.config({
+        float = {
+          border = "rounded",
+          source = "always",
+        },
+      })
     end,
   },
 }

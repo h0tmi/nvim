@@ -20,8 +20,8 @@ opt.showbreak = "↪"
 -- Search settings
 opt.ignorecase = true
 opt.smartcase = true
-opt.hlsearch = false
-opt.incsearch = true
+opt.hlsearch = true  -- Keep search highlighted
+opt.incsearch = true -- Show matches while typing
 
 -- Appearance
 opt.termguicolors = true
@@ -36,6 +36,9 @@ opt.clipboard = "unnamedplus"
 opt.splitright = true
 opt.splitbelow = true
 opt.splitkeep = "screen"
+opt.winminwidth = 5
+opt.winminheight = 1
+opt.equalalways = false -- Don't auto-resize all windows when closing one
 
 -- Files
 opt.swapfile = false
