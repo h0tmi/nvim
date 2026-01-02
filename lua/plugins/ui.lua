@@ -9,20 +9,194 @@ return {
     },
     config = function()
       require("nvim-tree").setup({
+        auto_reload_on_write = true,
+        disable_netrw = false,
+        hijack_netrw = true,
+        hijack_cursor = false,
+        hijack_unnamed_buffer_when_opening = false,
+        open_on_tab = false,
+        sort_by = "name",
+        update_cwd = false,
         view = {
           width = 30,
+          side = "left",
+          preserve_window_proportions = false,
+          number = false,
+          relativenumber = false,
+          signcolumn = "yes",
+          float = {
+            enable = false,
+          },
         },
         renderer = {
-          group_empty = true,
-          icons = {
-            show = {
-              git = true,
+          indent_markers = {
+            enable = false,
+            icons = {
+              corner = "└ ",
+              edge = "│ ",
+              none = "  ",
             },
+          },
+          icons = {
+            webdev_colors = true,
+          },
+        },
+        hijack_directories = {
+          enable = true,
+          auto_open = true,
+        },
+        update_focused_file = {
+          enable = false,
+          update_cwd = false,
+          ignore_list = {},
+        },
+        system_open = {
+          cmd = "",
+          args = {},
+        },
+        diagnostics = {
+          enable = false,
+          show_on_dirs = false,
+          icons = {
+            hint = "",
+            info = "",
+            warning = "",
+            error = "",
           },
         },
         filters = {
           dotfiles = false,
+          custom = {},
+          exclude = {},
         },
+        git = {
+          enable = true,
+          ignore = true,
+          timeout = 400,
+        },
+        actions = {
+          use_system_clipboard = true,
+          change_dir = {
+            enable = true,
+            global = false,
+            restrict_above_cwd = false,
+          },
+          open_file = {
+            quit_on_open = false,
+            resize_window = false,
+            window_picker = {
+              enable = true,
+              chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+              exclude = {
+                filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame" },
+                buftype = { "nofile", "terminal", "help" },
+              },
+            },
+          },
+        },
+        trash = {
+          cmd = "trash",
+          require_confirm = true,
+        },
+        log = {
+          enable = false,
+          truncate = false,
+          types = {
+            all = false,
+            config = false,
+            copy_paste = false,
+            diagnostics = false,
+            git = false,
+            profile = false,
+          },
+        },
+        ui = {
+          confirm = {
+            remove = true,
+            trash = true,
+            default_yes = false,
+          },
+        },
+      })
+
+      -- Override vim.ui.input for nvim-tree to use floating window
+      local original_ui_input = vim.ui.input
+      vim.ui.input = function(opts, on_confirm)
+        -- Check if this is being called from nvim-tree
+        local info = debug.getinfo(2, "S")
+        if info and info.source and info.source:match("nvim%-tree") then
+          -- Use floating window
+          local buf = vim.api.nvim_create_buf(false, true)
+          local width = 60
+          local height = 1
+
+          -- Get cursor position
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local row = cursor[1] - 1
+          local col = cursor[2]
+
+          local win = vim.api.nvim_open_win(buf, true, {
+            relative = "cursor",
+            width = width,
+            height = height,
+            row = 1,
+            col = 0,
+            border = "rounded",
+            title = " " .. (opts.prompt or "Input") .. " ",
+            title_pos = "center",
+            style = "minimal",
+          })
+
+          -- Set buffer content to default value
+          if opts.default then
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, { opts.default })
+            vim.api.nvim_win_set_cursor(win, { 1, #opts.default })
+            vim.cmd("startinsert!")
+          else
+            vim.cmd("startinsert")
+          end
+
+          -- Return the input when Enter is pressed
+          vim.keymap.set({ "i", "n" }, "<CR>", function()
+            local result = vim.api.nvim_buf_get_lines(buf, 0, -1, false)[1]
+            vim.api.nvim_win_close(win, true)
+            vim.api.nvim_buf_delete(buf, { force = true })
+            on_confirm(result)
+          end, { buffer = buf })
+
+          -- Cancel on Esc
+          vim.keymap.set({ "i", "n" }, "<Esc>", function()
+            vim.api.nvim_win_close(win, true)
+            vim.api.nvim_buf_delete(buf, { force = true })
+            on_confirm(nil)
+          end, { buffer = buf })
+        else
+          -- Use default vim.ui.input for other plugins
+          original_ui_input(opts, on_confirm)
+        end
+      end
+
+      -- Fix nvim-tree window width to prevent resizing
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "NvimTree",
+        callback = function()
+          vim.opt_local.winfixwidth = true
+        end,
+      })
+
+      -- Ensure tree stays at fixed width when entering/leaving
+      vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+        pattern = "*",
+        callback = function()
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+            if ft == "NvimTree" then
+              vim.api.nvim_win_set_width(win, 30)
+              vim.wo[win].winfixwidth = true
+            end
+          end
+        end,
       })
     end,
   },
@@ -33,6 +207,21 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
     config = function()
+      -- Function to get active LSP clients
+      local function lsp_clients()
+        local clients = vim.lsp.get_clients({ bufnr = 0 })
+        if next(clients) == nil then
+          return ""
+        end
+
+        local client_names = {}
+        for _, client in pairs(clients) do
+          table.insert(client_names, client.name)
+        end
+
+        return " " .. table.concat(client_names, ", ")
+      end
+
       require("lualine").setup({
         options = {
           theme = "gruvbox-material",
@@ -44,7 +233,7 @@ return {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
           lualine_c = { "filename" },
-          lualine_x = { "encoding", "fileformat", "filetype" },
+          lualine_x = { lsp_clients, "encoding", "fileformat", "filetype" },
           lualine_y = { "progress" },
           lualine_z = { "location" },
         },

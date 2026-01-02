@@ -33,6 +33,7 @@ opt.sidescrolloff = 8
 -- Behavior
 opt.mouse = "a"
 opt.clipboard = "unnamedplus"
+opt.confirm = true -- Ask for confirmation when handling unsaved or read-only files
 opt.splitright = true
 opt.splitbelow = true
 opt.splitkeep = "screen"

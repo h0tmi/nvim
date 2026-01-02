@@ -173,51 +173,8 @@ return {
           "--function-arg-placeholders=true",
         },
         filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-        root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", ".git" },
-        capabilities = capabilities,
+        root_markers = { ".clangd", ".clang-tidy", ".git", "compile_commands.json" },
       })
-
-      vim.lsp.config("gopls", {
-        cmd = { "gopls" },
-        filetypes = { "go", "gomod", "gowork", "gotmpl" },
-        root_markers = { "go.work", "go.mod", ".git" },
-        capabilities = capabilities,
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-            },
-            staticcheck = true,
-            gofumpt = true,
-          },
-        },
-      })
-
-      vim.lsp.config("pyright", {
-        cmd = { "pyright-langserver", "--stdio" },
-        filetypes = { "python" },
-        root_markers = { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
-        capabilities = capabilities,
-        settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = "basic",
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-            },
-          },
-        },
-      })
-
-      vim.lsp.config("bashls", {
-        cmd = { "bash-language-server", "start" },
-        filetypes = { "sh", "bash" },
-        root_markers = { ".git" },
-        capabilities = capabilities,
-      })
-
-      -- Enable all LSP servers
-      vim.lsp.enable({ "clangd", "gopls", "pyright", "bashls" })
 
       -- Configure LSP floating window borders (like old config)
       vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
