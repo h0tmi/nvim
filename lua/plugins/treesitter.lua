@@ -1,97 +1,53 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  lazy = false, -- treesitter does not support lazy-loading
   build = ":TSUpdate",
-  event = { "BufReadPost", "BufNewFile" },
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-  },
   config = function()
-    require("nvim-treesitter.configs").setup({
-      -- Install parsers for these languages
-      ensure_installed = {
-        "lua",
-        "vim",
-        "vimdoc",
-        "python",
-        "javascript",
-        "typescript",
-        "json",
-        "html",
-        "css",
-        "bash",
-        "markdown",
-        "markdown_inline",
+    -- Setup treesitter
+    require("nvim-treesitter").setup({
+      install_dir = vim.fn.stdpath("data") .. "/site",
+    })
+
+    -- Install parsers
+    local parsers = {
+      "lua", "vim", "vimdoc", "query",
+      "c", "cpp",
+      "go",
+      "python",
+      "bash",
+      "javascript", "typescript",
+      "json", "yaml", "toml",
+      "html", "css",
+      "markdown", "markdown_inline",
+      "rust",
+    }
+    require("nvim-treesitter").install(parsers)
+
+    -- Enable highlighting for supported filetypes only
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = {
+        "lua", "vim", "vimdoc", "query",
+        "c", "cpp",
         "go",
+        "python",
+        "bash", "sh",
+        "javascript", "typescript",
+        "json", "yaml", "toml",
+        "html", "css",
+        "markdown",
         "rust",
-        "c",
-        "cpp",
-        "yaml",
-        "toml",
       },
+      callback = function()
+        pcall(vim.treesitter.start)
+      end,
+    })
 
-      -- Install parsers synchronously (only applied to `ensure_installed`)
-      sync_install = false,
-
-      -- Automatically install missing parsers when entering buffer
-      auto_install = true,
-
-      -- Highlight configuration
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-      },
-
-      -- Indentation based on treesitter
-      indent = {
-        enable = true,
-      },
-
-      -- Incremental selection
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-
-      -- Text objects
-      textobjects = {
-        select = {
-          enable = true,
-          lookahead = true,
-          keymaps = {
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-            ["ac"] = "@class.outer",
-            ["ic"] = "@class.inner",
-            ["aa"] = "@parameter.outer",
-            ["ia"] = "@parameter.inner",
-          },
-        },
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = {
-            ["]f"] = "@function.outer",
-            ["]c"] = "@class.outer",
-          },
-          goto_next_end = {
-            ["]F"] = "@function.outer",
-            ["]C"] = "@class.outer",
-          },
-          goto_previous_start = {
-            ["[f"] = "@function.outer",
-            ["[c"] = "@class.outer",
-          },
-          goto_previous_end = {
-            ["[F"] = "@function.outer",
-            ["[C"] = "@class.outer",
-          },
-        },
-      },
+    -- Enable indentation for specific filetypes
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = { "lua", "python", "c", "cpp", "go", "javascript", "typescript", "rust" },
+      callback = function()
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end,
     })
   end,
 }

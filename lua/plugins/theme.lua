@@ -3,7 +3,9 @@ return {
   lazy = false,
   priority = 1000,
   config = function()
-    -- Configure gruvbox-material
+    vim.g.gruvbox_material_foreground = "material"
+    vim.g.gruvbox_material_background = "hard"
+    vim.g.gruvbox_material_enable_italic = 1
     vim.g.gruvbox_material_better_performance = 1
 
     -- Auto light/dark switching based on macOS system appearance
@@ -14,16 +16,12 @@ return {
         handle:close()
 
         if result:match("Dark") then
-          vim.g.gruvbox_material_background = "hard"
           vim.opt.background = "dark"
         else
-          vim.g.gruvbox_material_background = "soft"
           vim.opt.background = "light"
         end
       else
-        -- Default to light if can't detect
-        vim.g.gruvbox_material_background = "soft"
-        vim.opt.background = "light"
+        vim.opt.background = "dark"
       end
     end
 
