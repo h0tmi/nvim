@@ -214,6 +214,10 @@ keymap.set("x", "$", "g_")
 keymap.set("x", "<", "<gv")
 keymap.set("x", ">", ">gv")
 
+-- Tab/Shift+Tab for indentation in visual mode
+keymap.set("x", "<Tab>", ">gv", { desc = "indent selection" })
+keymap.set("x", "<S-Tab>", "<gv", { desc = "dedent selection" })
+
 -- Replace visual selection with text in register, but not contaminate the register
 keymap.set("x", "p", '"_c<Esc>p')
 

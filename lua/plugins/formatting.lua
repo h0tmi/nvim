@@ -14,9 +14,9 @@ return {
   },
   opts = {
     formatters_by_ft = {
-      -- C/C++
-      c = { "clang_format" },
-      cpp = { "clang_format" },
+      -- C/C++ (only sort includes and trim whitespace)
+      c = { "clang_format", "trim_whitespace" },
+      cpp = { "clang_format", "trim_whitespace" },
 
       -- Python
       python = { "black", "isort" },
@@ -58,10 +58,19 @@ return {
 
     formatters = {
       clang_format = {
-        prepend_args = { "--style=file" }, -- Use .clang-format file if exists
+        -- Only sort includes, don't reformat code
+        prepend_args = {
+          "--style={BasedOnStyle: LLVM, SortIncludes: true, DisableFormat: true}",
+        },
       },
       shfmt = {
         prepend_args = { "-i", "4" }, -- 4 space indent for shell scripts
+      },
+      -- Custom formatter to trim trailing whitespace
+      trim_whitespace = {
+        command = "sed",
+        args = { "-i", "", "-e", "s/[[:space:]]*$//" },
+        stdin = false,
       },
     },
   },

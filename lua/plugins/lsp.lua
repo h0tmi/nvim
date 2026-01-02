@@ -123,7 +123,89 @@ return {
             vim.lsp.buf.rename()
           end, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
 
-          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+          -- Code actions in popup window
+          vim.keymap.set("n", "<leader>ca", function()
+            local original_select = vim.ui.select
+            vim.ui.select = function(items, select_opts, on_choice)
+              if #items == 0 then
+                vim.notify("No code actions available", vim.log.levels.INFO)
+                vim.ui.select = original_select
+                return
+              end
+
+              local buf = vim.api.nvim_create_buf(false, true)
+              local lines = {}
+              for i, item in ipairs(items) do
+                local title
+                if select_opts.format_item then
+                  title = select_opts.format_item(item)
+                elseif type(item) == "table" and item.title then
+                  title = item.title
+                else
+                  title = tostring(item)
+                end
+                table.insert(lines, string.format("%d: %s", i, title))
+              end
+
+              local width = 60
+              for _, line in ipairs(lines) do
+                width = math.max(width, #line + 4)
+              end
+              local height = math.min(#lines, 15)
+
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+              vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
+
+              local win = vim.api.nvim_open_win(buf, true, {
+                relative = "cursor",
+                row = 1,
+                col = 0,
+                width = width,
+                height = height,
+                style = "minimal",
+                border = "rounded",
+                title = " Code Actions ",
+                title_pos = "center",
+              })
+
+              local function close_and_restore()
+                if vim.api.nvim_win_is_valid(win) then
+                  vim.api.nvim_win_close(win, true)
+                end
+                vim.ui.select = original_select
+              end
+
+              -- Select action with number key or Enter
+              for i = 1, math.min(#items, 9) do
+                vim.keymap.set("n", tostring(i), function()
+                  close_and_restore()
+                  if on_choice then on_choice(items[i], i) end
+                end, { buffer = buf })
+              end
+
+              vim.keymap.set("n", "<CR>", function()
+                local lnum = vim.api.nvim_win_get_cursor(win)[1]
+                close_and_restore()
+                if on_choice then on_choice(items[lnum], lnum) end
+              end, { buffer = buf })
+
+              vim.keymap.set("n", "<Esc>", function()
+                close_and_restore()
+                if on_choice then on_choice(nil, nil) end
+              end, { buffer = buf })
+
+              vim.keymap.set("n", "q", function()
+                close_and_restore()
+                if on_choice then on_choice(nil, nil) end
+              end, { buffer = buf })
+
+              -- Navigate with j/k
+              vim.keymap.set("n", "j", "j", { buffer = buf })
+              vim.keymap.set("n", "k", "k", { buffer = buf })
+            end
+
+            vim.lsp.buf.code_action()
+          end, vim.tbl_extend("force", opts, { desc = "Code action" }))
           vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show diagnostics" }))
           vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
           vim.keymap.set("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
