@@ -370,7 +370,8 @@ Configuration inspired by modern Neovim setups and optimized for software develo
 
 1. Better quickfix window
 2. Better inlined windows while gd, gr.
-3. TBA
+3. Tab buffers
+4. Ctrl +hjkl inside tabs
 
 ## License
 
