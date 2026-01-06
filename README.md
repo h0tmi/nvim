@@ -366,6 +366,12 @@ keymap("n", "<your-key>", "<your-command>", { desc = "Description" })
 
 Configuration inspired by modern Neovim setups and optimized for software development workflows.
 
+## TODO
+
+1. Better quickfix window
+2. Better inlined windows while gd, gr.
+3. TBA
+
 ## License
 
 MIT License - Feel free to use and modify as needed.
