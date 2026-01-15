@@ -323,7 +323,7 @@ return {
       wk.add({
         { "<leader>b", group = "Buffer" },
         { "<leader>c", group = "Code" },
-        { "<leader>d", group = "Diagnostics/Debug/Detour" },
+        { "<leader>d", group = "Diagnostics/Debug" },
         { "<leader>f", group = "Format/Find" },
         { "<leader>q", group = "Quit/Quickfix" },
         { "<leader>r", group = "Rename/Replace" },

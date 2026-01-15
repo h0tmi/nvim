@@ -25,7 +25,6 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
       "hrsh7th/nvim-cmp",
-      "carbon-steel/detour.nvim",
     },
     config = function()
       require("mason-lspconfig").setup({
@@ -44,28 +43,11 @@ return {
         callback = function(ev)
           local opts = { buffer = ev.buf, silent = true }
 
-          -- Check if detour is available
-          local has_detour, detour = pcall(require, "detour")
+          -- Go to definition
+          vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
 
-          -- Go to definition in detour popup
-          vim.keymap.set("n", "gd", function()
-            if has_detour then
-              detour.Detour()
-              vim.lsp.buf.definition()
-            else
-              vim.lsp.buf.definition()
-            end
-          end, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-
-          -- Go to declaration in detour popup
-          vim.keymap.set("n", "gD", function()
-            if has_detour then
-              detour.Detour()
-              vim.lsp.buf.declaration()
-            else
-              vim.lsp.buf.declaration()
-            end
-          end, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
+          -- Go to declaration
+          vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
 
           vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Show references" }))
           vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
